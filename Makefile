@@ -20,7 +20,7 @@ OUTPUT = app.elf
 HEXFILE = app.hex
 
 CFLAGS = -g -c -Wall -std=c99 -Os -mmcu=$(MCU) $(INC)
-LFLAGS = -g -Wall -Os -std=c99 -mmcu=$(MCU)
+LFLAGS = -g -Wall -Os -std=c99 -mmcu=$(MCU) -lm
 
 OBJS = uart.o main.o dht11.o lcd.o adc.o
 

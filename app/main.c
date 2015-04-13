@@ -21,10 +21,10 @@
 
 #define ALERT_THRESHOLD 20
 
-#define MQ137_PIN 2 // PC2
+#define MQ137_PIN 0 // PC2
 
-#define RELAY_PIN1 2
-#define RELAY_PIN2 3
+// #define RELAY_PIN1 2
+// #define RELAY_PIN2 3
 
 uint8_t alertFlag = 0, smsFlag = 0;
 
@@ -52,13 +52,15 @@ int main(void)
 	adc_init();
 	_delay_ms(2000);
 
-  DDRB |= (1 << RELAY_PIN1);
-  DDRB |= (1 << RELAY_PIN2);
-  PORTB &= ~(1 << RELAY_PIN1);
-  PORTB &= ~(1 << RELAY_PIN2);
+  // DDRB |= (1 << RELAY_PIN1);
+  // DDRB |= (1 << RELAY_PIN2);
+  // PORTB &= ~(1 << RELAY_PIN1);
+  // PORTB &= ~(1 << RELAY_PIN2);
+  DDRC = 0xFF;
+  PORTC = 0x00;
 
-  DDRC &= ~(1 << MQ137_PIN);
-  PORTC |= (1 << MQ137_PIN);
+  // DDRC &= ~(1 << MQ137_PIN);
+  // PORTC |= (1 << MQ137_PIN);
 
 	sendSms(MOB_NUM, "System Started");
 
@@ -69,10 +71,11 @@ int main(void)
 			uint8_t temp = data[0];
 			uint8_t humi = data[1];
 			uint16_t sensorValue  = analog_read(MQ137_PIN);
-			uint16_t x = sensorValue / 490.5077053;
-  			uint16_t ppm = 116.6020682 * pow(x, 2.769034857);
+			double x = sensorValue / 237.06;
+  		uint16_t ppm = 116.60 * pow(x, 2.76);
+      //uint16_t ppm = sensorValue;
 
-  			sprintf(buff,"T:%d C, ",temp);
+  			sprintf(buff,"T:%d C, ",temp); 
   			lcd_write_instruction_4d(0x80);
   			lcd_print(buff);
 
@@ -135,8 +138,9 @@ int main(void)
   					smsFlag = 1;
             if(humi > HUMI_LIM_HIGH)
             {
-                PORTB |= (1 << RELAY_PIN1);
-                PORTB |= (1 << RELAY_PIN2);          
+                // PORTB |= (1 << RELAY_PIN1);
+                // PORTB |= (1 << RELAY_PIN2);
+                PORTC = 0xFF;          
             }
 
   					sprintf(buff, "Warning:- Temperature: %d C, Humidity: %d RH,CO2: %d ppm",temp,humi,ppm);
@@ -148,8 +152,9 @@ int main(void)
   			}
   			else
   			{
-          PORTB &= ~(1 << RELAY_PIN1);
-          PORTB &= ~(1 << RELAY_PIN2);         
+          // PORTB &= ~(1 << RELAY_PIN1);
+          // PORTB &= ~(1 << RELAY_PIN2);   
+          PORTC = 0x00;      
   				alertFlag = 0;
   				smsFlag = 0;
   				lcd_print("        ");
